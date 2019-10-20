@@ -3,7 +3,6 @@ import java.awt.event.*;
 import javax.swing.*;
 import java.util.Random;
 import java.util.ArrayList;
-import FaceDraw.Face;
 
 
 
@@ -83,7 +82,6 @@ class MosaicFrame extends JFrame implements ActionListener{
 	private ArrayList<TileDraw> tileList;
 	JPanel buttonPanel = new JPanel();
 	JButton randomize = new JButton("Randomize");
-	JButton makeFace = new JButton();
 
 
 	public MosaicFrame(){
@@ -110,8 +108,6 @@ class MosaicFrame extends JFrame implements ActionListener{
 			TileDraw tile = new TileDraw();
 			tileList.add(tile);
 			tilePanel.add(tile);
-			tilePanel.add(makeFace);
-			makeFace.addActionListener(this);
 		}
 	}
 
