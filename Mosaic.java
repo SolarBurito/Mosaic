@@ -1,46 +1,37 @@
 import java.awt.*;
+import java.awt.event.*;
 import javax.swing.*;
 import java.util.Random;
+import java.util.ArrayList;
+import FaceDraw.Face;
 
 
 
 class TileDraw extends JPanel{
-	private int height;
-	private int area = height*height;
-	private int fontSize =  area/3;
+	private int red, green, blue, shape;
+	private int height = 84;
+	private int fontSize = height/3;
 	private String letter;
-	private Color color;
-	private Color fontColor;
-
-	public int getHeight(){return height;}
-	public String getLetter(){return letter;}
-	public Color getColor(){return color;}
-
-	public void setHeight(int height_){height = height_;}
-	public void setLetter(String letter_){ letter=letter_;}
-	public void setColor(Color color_){ color=color_;}
-	public void setFontColor(Color color_){ fontColor=color_;}
+	private Color color, fontColor;
+	Random rng = new Random();
 
 
-
-
-	public TileDraw(int height_, String letter_, Color color_){
+	public TileDraw(){
 		super();
 		randomizeTile();
 	}
 
 	public void randomizeTile(){
-		Random rng = new Random();
-		int r = rng.nextInt(255);
-		int g = rng.nextInt(255);
-		int b = rng.nextInt(255);
-		setColor(new Color(r,g,b));
-		setFontColor(new Color(GetContrastingColor(r),GetContrastingColor(g),GetContrastingColor(b)));
+		red = rng.nextInt(255);
+		green = rng.nextInt(255);
+		blue = rng.nextInt(255);
+		color = new Color(red,green,blue);
+		fontColor = new Color(GetContrastingColor(red),GetContrastingColor(green),GetContrastingColor(blue));
 
+		letter = "" + (char) (rng.nextInt(26) + 'A');
+		shape = rng.nextInt(2);
 
-		char l_ = (char) (rng.nextInt(26) + 'A');
-		String l = String.valueOf(l_);
-		setLetter(l);
+		System.out.println(this.toString());
 	}
 
 	private static int GetContrastingColor(int color_) {
@@ -50,31 +41,100 @@ class TileDraw extends JPanel{
 	public void paintComponent(Graphics g){
 		super.paintComponent(g);
 
+		int panelHeight = height;
+		int panelWidth = height;
 
 		g.setColor(color);
-		g.fillRect(10,10, getHeight() - 10, getHeight() -10);
+		
 
-		g.setColor(fontColor);
-		g.setFont(new Font("TimesRoman", Font.PLAIN, fontSize));
-		g.drawString(getLetter(),getHeight(),getHeight());
+		if (shape == 0){
+			g.fillRect(10,10,height,height);
+		}else{
+			g.fillOval(10,10,height,height);
+		}
+
+
+
+        g.setColor(new Color(GetContrastingColor(red),GetContrastingColor(green),GetContrastingColor(blue)));
+
+        g.setFont(new Font("TimesRoman", Font.PLAIN, fontSize));
+        int stringX = (panelWidth/2);
+        int stringY = (panelHeight/2);
+        g.drawString(letter,stringX,stringY);
+
+
 	}
+
+	public String toString(){
+		String out;
+		if (shape == 0){
+			out = String.format("Shape: Square --- Color (RGB): %d %d %d --- Letter: %s", red, green, blue, letter);
+		}else{
+			out = String.format("Shape: Circle --- Color (RGB): %d %d %d --- Letter: %s", red, green, blue, letter);
+
+		}
+
+		return out;
+	}
+
 }
 
-class MosaicFrame extends JFrame{
+class MosaicFrame extends JFrame implements ActionListener{
+	private ArrayList<TileDraw> tileList;
+	JPanel buttonPanel = new JPanel();
+	JButton randomize = new JButton("Randomize");
+	JButton makeFace = new JButton();
 
+
+	public MosaicFrame(){
+		setBounds(200,1000,1280,1280);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		Container contentPane = getContentPane();
+		contentPane.setLayout(new BorderLayout());
+
+		contentPane.add(buttonPanel, BorderLayout.SOUTH);
+
+		buttonPanel.add(randomize);
+		randomize.addActionListener(this);
+
+		JPanel tilePanel = new JPanel();
+		contentPane.add(tilePanel, BorderLayout.CENTER);
+		tilePanel.setLayout(new GridLayout(12,12));
+
+
+		tileList = new ArrayList<TileDraw>();
+		System.out.println("Start Paint***");
+
+		for(int i = 1; i < 145; i++){
+			TileDraw tile = new TileDraw();
+			tileList.add(tile);
+			tilePanel.add(tile);
+			tilePanel.add(makeFace);
+			makeFace.addActionListener(this);
+		}
+	}
+
+	public void actionPerformed(ActionEvent e){
+		if (e.getSource() == randomize){
+			for (TileDraw tile : tileList){
+				tile.randomizeTile();
+			}
+		}else{
+			}
+		
+
+		repaint();
+	}
 
 }
 
-class TilePanel extends JPanel{
-
-}
-
-class ButtonPanel{
-	
-}
 
 public class Mosaic{
 	public static void main(String[] args){
 		System.out.println("Starting Mosaic...");
+
+		MosaicFrame myFrame = new MosaicFrame();
+		myFrame.setVisible(true);
 	}
 }
